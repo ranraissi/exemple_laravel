@@ -1,19 +1,29 @@
 <?php
 
-use App\Http\Controllers\UserController;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\UserController;
+use Illuminate\Support\Facades\Route;
 
-Route::post('/register',[AuthController::class,'register']);
-Route::post('/login',[AuthController::class,'login']);
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
 
 Route::middleware('auth:sanctum')->group(function () {
 
-    Route::get('/user', function (Request $request) {
-        return $request->user();
-    });
+    Route::post('/logout', [AuthController::class, 'logout']);
 
-    Route::resource('users', UserController::class);
-    
+    // Profile (own data)
+    Route::get('/profile', [ProfileController::class, 'show']);
+    Route::put('/profile', [ProfileController::class, 'update']);
+
+    // Users CRUD (permission-based)
+    Route::get('/users', [UserController::class, 'index'])->middleware('permission:view users');
+    Route::post('/users', [UserController::class, 'store'])->middleware('permission:create users');
+    Route::get('/users/{id}', [UserController::class, 'show'])->middleware('permission:view users');
+    Route::put('/users/{id}', [UserController::class, 'update'])->middleware('permission:update users');
+    Route::delete('/users/{id}', [UserController::class, 'destroy'])->middleware('permission:delete users');
+
+    // Assign role (admin only)
+    Route::post('/users/{id}/assign-role', [UserController::class, 'assignRole'])->middleware('permission:assign roles');
+
 });
