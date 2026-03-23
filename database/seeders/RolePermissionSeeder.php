@@ -24,7 +24,7 @@ class RolePermissionSeeder extends Seeder
 
         // Assign permissions
         $admin->givePermissionTo(Permission::all());
-        $user->givePermissionTo(['view users']);
+        // user role has no permissions on other users (only profile access)
 
         // Create users
         $this->run_user();
