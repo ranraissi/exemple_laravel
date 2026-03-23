@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\User;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
@@ -11,18 +12,36 @@ class RolePermissionSeeder extends Seeder
     public function run()
     {
         // Permissions
-        Permission::create(['name' => 'view users']);
-        Permission::create(['name' => 'create users']);
-        Permission::create(['name' => 'update users']);
-        Permission::create(['name' => 'delete users']);
-        Permission::create(['name' => 'assign roles']);
+        Permission::firstOrCreate(['name' => 'view users']);
+        Permission::firstOrCreate(['name' => 'create users']);
+        Permission::firstOrCreate(['name' => 'update users']);
+        Permission::firstOrCreate(['name' => 'delete users']);
+        Permission::firstOrCreate(['name' => 'assign roles']);
 
         // Roles
-        $admin = Role::create(['name' => 'admin']);
-        $user = Role::create(['name' => 'user']);
+        $admin = Role::firstOrCreate(['name' => 'admin']);
+        $user = Role::firstOrCreate(['name' => 'user']);
 
         // Assign permissions
         $admin->givePermissionTo(Permission::all());
         $user->givePermissionTo(['view users']);
+
+        // Create users
+        $this->run_user();
+    }
+
+    public function run_user(): void
+    {
+        $admin = User::firstOrCreate(
+            ['email' => 'admin@admin.com'],
+            ['name' => 'Admin', 'password' => 'password123']
+        );
+        $admin->assignRole('admin');
+
+        $user = User::firstOrCreate(
+            ['email' => 'user@user.com'],
+            ['name' => 'User', 'password' => 'password123']
+        );
+        $user->assignRole('user');
     }
 }
